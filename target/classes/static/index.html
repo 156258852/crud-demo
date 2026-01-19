@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Todo BFF Demo</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f7fa;
+    }
+    #app {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+    h2 {
+      color: #2c3e50;
+      margin-top: 0;
+      text-align: center;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 15px;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .delete-btn {
+      background-color: #e74c3c;
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      margin-bottom: 8px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      border-left: 4px solid #3498db;
+    }
+    li:nth-child(even) {
+      border-left-color: #2ecc71;
+      background-color: #f0faf5;
+    }
+    .todo-text {
+      flex: 1;
+      word-break: break-word;
+      padding-right: 15px;
+    }
+    .completed {
+      text-decoration: line-through;
+      color: #95a5a6;
+    }
+    .empty-state {
+      text-align: center;
+      color: #95a5a6;
+      font-style: italic;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <h2>Todo List</h2>
+  <div class="input-group">
+    <input v-model="text" @keyup.enter="add" placeholder="输入新的待办事项...">
+    <button @click="add">添加</button>
+  </div>
+  <ul v-if="todos.length > 0">
+    <li v-for="t in todos" :key="t.id">
+      <span class="todo-text" :class="{ 'completed': t.done }">{{ t.text }}</span>
+      <button class="delete-btn" @click="del(t.id)">删除</button>
+    </li>
+  </ul>
+  <div v-else class="empty-state">
+    暂无待办事项，添加一个新的吧！
+  </div>
+</div>
+<script>
+  const { createApp } = Vue;
+  createApp({
+    data() { return { todos:[], text:'' }; },
+    mounted() { this.load(); },
+    methods: {
+      load()  { axios.get('/api/todo').then(r => this.todos = r.data); },
+      add()   { 
+        if (this.text.trim()) {
+          axios.post('/api/todo',{text:this.text,done:false}).then(this.load); 
+          this.text=''; 
+        }
+      },
+      del(id) { axios.delete('/api/todo/'+id).then(this.load); }
+    }
+  }).mount('#app');
+</script>
+</body>
+</html>
