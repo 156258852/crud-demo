@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class Todo {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO) //作用是自动生成主键值
     private Long id;
     private String text;
     private boolean done;

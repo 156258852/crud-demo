@@ -9,16 +9,31 @@ import java.util.List;
 @RequestMapping("/api/todo")
 @RequiredArgsConstructor
 public class TodoController {
-    private final TodoRepo repo;
+    private final TodoService todoService;
 
 
     @GetMapping
     public List<Todo> all() { 
-        return repo.findAll(); }
+        return todoService.getAllTodos(); 
+    }
 
     @PostMapping
-    public Todo create(@RequestBody Todo todo) { return repo.save(todo); }
+    public Todo create(@RequestBody Todo todo) { 
+        return todoService.createTodo(todo); 
+    }
+
+    @PutMapping("/{id}")
+    public Todo update(@PathVariable Long id, @RequestBody Todo todo) {
+        return todoService.updateTodo(id, todo);
+    }
+    
+    @PatchMapping("/{id}/toggle")
+    public Todo toggleStatus(@PathVariable Long id) {
+        return todoService.toggleTodoStatus(id);
+    }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) { repo.deleteById(id); }
+    public void delete(@PathVariable Long id) { 
+        todoService.deleteTodo(id); 
+    }
 }

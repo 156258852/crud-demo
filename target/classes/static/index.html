@@ -56,6 +56,24 @@
     button:hover {
       background-color: #2980b9;
     }
+    .edit-btn {
+      background-color: #f39c12;
+      padding: 6px 12px;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+    .edit-btn:hover {
+      background-color: #d35400;
+    }
+    .toggle-btn {
+      background-color: #2ecc71;
+      padding: 6px 12px;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+    .toggle-btn:hover {
+      background-color: #27ae60;
+    }
     .delete-btn {
       background-color: #e74c3c;
       padding: 6px 12px;
@@ -91,6 +109,13 @@
       text-decoration: line-through;
       color: #95a5a6;
     }
+    .editing-input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
     .empty-state {
       text-align: center;
       color: #95a5a6;
@@ -108,8 +133,17 @@
   </div>
   <ul v-if="todos.length > 0">
     <li v-for="t in todos" :key="t.id">
-      <span class="todo-text" :class="{ 'completed': t.done }">{{ t.text }}</span>
-      <button class="delete-btn" @click="del(t.id)">删除</button>
+      <span v-if="!t.editing" class="todo-text" :class="{ 'completed': t.done }">{{ t.text }}</span>
+      <input v-else v-model="t.editText" class="editing-input" @keyup.enter="finishEdit(t)" />
+      <div>
+        <button v-if="!t.editing" class="edit-btn" @click="startEdit(t)">编辑</button>
+        <button v-if="t.editing" @click="finishEdit(t)">保存</button>
+        <button v-if="t.editing" @click="cancelEdit(t)">取消</button>
+        <button class="toggle-btn" @click="toggle(t)">
+          {{ t.done ? '标记未完成' : '标记完成' }}
+        </button>
+        <button class="delete-btn" @click="del(t.id)">删除</button>
+      </div>
     </li>
   </ul>
   <div v-else class="empty-state">
@@ -117,19 +151,116 @@
   </div>
 </div>
 <script>
-  const { createApp } = Vue;
+  const { createApp, ref, onMounted } = Vue;
+  
   createApp({
-    data() { return { todos:[], text:'' }; },
-    mounted() { this.load(); },
-    methods: {
-      load()  { axios.get('/api/todo').then(r => this.todos = r.data); },
-      add()   { 
-        if (this.text.trim()) {
-          axios.post('/api/todo',{text:this.text,done:false}).then(this.load); 
-          this.text=''; 
+    setup() {
+      const todos = ref([]);
+      const text = ref('');
+      
+      const api = {
+        fetchTodos: () => axios.get('/api/todo'),
+        createTodo: (data) => axios.post('/api/todo', data),
+        updateTodo: (id, data) => axios.put(`/api/todo/${id}`, data),
+        deleteTodo: (id) => axios.delete(`/api/todo/${id}`),
+        toggleTodo: (id) => axios.patch(`/api/todo/${id}/toggle`)
+      };
+      
+      const loadTodos = async () => {
+        try {
+          const response = await api.fetchTodos();
+          todos.value = response.data.map(todo => ({
+            ...todo,
+            editing: false,
+            editText: todo.text
+          }));
+        } catch (error) {
+          console.error('加载待办事项失败:', error);
+          alert('加载数据失败，请刷新页面重试');
         }
-      },
-      del(id) { axios.delete('/api/todo/'+id).then(this.load); }
+      };
+      
+      const addTodo = async () => {
+        if (!text.value.trim()) return;
+        
+        try {
+          await api.createTodo({ text: text.value, done: false });
+          text.value = '';
+          await loadTodos();
+        } catch (error) {
+          console.error('添加待办事项失败:', error);
+          alert('添加失败，请重试');
+        }
+      };
+      
+      const deleteTodo = async (id) => {
+        try {
+          await api.deleteTodo(id);
+          await loadTodos();
+        } catch (error) {
+          console.error('删除待办事项失败:', error);
+          alert('删除失败，请重试');
+        }
+      };
+      
+      const startEdit = (todo) => {
+        todo.editing = true;
+        todo.editText = todo.text;
+      };
+      
+      const finishEdit = async (todo) => {
+        if (!todo.editText.trim()) {
+          alert('待办事项不能为空！');
+          return;
+        }
+        
+        try {
+          await api.updateTodo(todo.id, { 
+            text: todo.editText, 
+            done: todo.done 
+          });
+          await loadTodos(); // 重新加载列表
+        } catch (error) {
+          console.error('更新待办事项失败:', error);
+          alert('更新失败，请重试');
+        }
+      };
+      
+      const cancelEdit = (todo) => {
+        todo.editing = false;
+        todo.editText = todo.text;
+      };
+      
+      const toggleTodoStatus = async (todo) => {
+        try {
+          const response = await api.toggleTodo(todo.id);
+          // 更新本地数据
+          const index = todos.value.findIndex(item => item.id === todo.id);
+          if (index !== -1) {
+            todos.value[index] = response.data;
+          }
+        } catch (error) {
+          console.error('切换待办事项状态失败:', error);
+          alert('状态切换失败，请重试');
+        }
+      };
+      
+      onMounted(() => {
+        loadTodos();
+      });
+      
+      // 返回响应式数据和方法
+      return {
+        todos,
+        text,
+        loadTodos,
+        add: addTodo,
+        del: deleteTodo,
+        startEdit,
+        finishEdit,
+        cancelEdit,
+        toggle: toggleTodoStatus
+      };
     }
   }).mount('#app');
 </script>

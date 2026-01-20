@@ -60,6 +60,15 @@ public class Todo {
 - 类中的字段会自动映射为表中的列
 - 访问 http://localhost:8080/h2-console 可以查看生成的表结构
 
+## H2数据库说明
+
+本项目使用H2内存数据库，具有以下特点：
+- 数据库URL: `jdbc:h2:mem:testdb`
+- 用户名: `sa`
+- 密码: （留空）
+- 数据仅在应用运行期间存在，重启后丢失
+- 适用于开发和测试环境，方便快速重置数据
+
 3.2 数据接口 TodoRepo.java
 ```java
 package com.example.demo;
