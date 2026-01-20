@@ -56,14 +56,26 @@
     button:hover {
       background-color: #2980b9;
     }
-    .edit-btn {
+    .edit-btn, .save-btn, .cancel-btn {
       background-color: #f39c12;
       padding: 6px 12px;
       font-size: 14px;
       margin-right: 5px;
     }
-    .edit-btn:hover {
+    .edit-btn:hover, .save-btn:hover, .cancel-btn:hover {
       background-color: #d35400;
+    }
+    .save-btn {
+      background-color: #3498db;
+    }
+    .save-btn:hover {
+      background-color: #2980b9;
+    }
+    .cancel-btn {
+      background-color: #95a5a6;
+    }
+    .cancel-btn:hover {
+      background-color: #7f8c8d;
     }
     .toggle-btn {
       background-color: #2ecc71;
@@ -137,8 +149,8 @@
       <input v-else v-model="t.editText" class="editing-input" @keyup.enter="finishEdit(t)" />
       <div>
         <button v-if="!t.editing" class="edit-btn" @click="startEdit(t)">编辑</button>
-        <button v-if="t.editing" @click="finishEdit(t)">保存</button>
-        <button v-if="t.editing" @click="cancelEdit(t)">取消</button>
+        <button v-if="t.editing" class="save-btn" @click="finishEdit(t)">保存</button>
+        <button v-if="t.editing" class="cancel-btn" @click="cancelEdit(t)">取消</button>
         <button class="toggle-btn" @click="toggle(t)">
           {{ t.done ? '标记未完成' : '标记完成' }}
         </button>
