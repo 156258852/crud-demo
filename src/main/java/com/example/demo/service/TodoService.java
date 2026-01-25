@@ -1,8 +1,10 @@
-package com.example.demo;
+package com.example.demo.service;
 
-import org.springframework.stereotype.Service;
-
+import com.example.demo.exception.TodoNotFoundException;
+import com.example.demo.model.Todo;
+import com.example.demo.repository.TodoRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +12,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TodoService {
-    
     private final TodoRepo todoRepo;
 
     public List<Todo> getAllTodos() {

@@ -1,7 +1,9 @@
-package com.example.demo;
+package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -15,6 +17,8 @@ public class Todo {
     private Long id;
     
     @Schema(description = "待办事项文本内容", example = "完成项目报告")
+    @NotBlank(message = "待办事项内容不能为空")
+    @Size(max = 500, message = "待办事项内容不能超过500个字符")
     private String text;
     
     @Schema(description = "是否已完成", example = "false")

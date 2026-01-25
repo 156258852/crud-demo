@@ -1,5 +1,7 @@
-package com.example.demo;
+package com.example.demo.controller;
 
+import com.example.demo.model.Todo;
+import com.example.demo.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/todo")
@@ -31,10 +34,11 @@ public class TodoController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "成功创建待办事项",
             content = @Content(mediaType = "application/json", 
-            schema = @Schema(implementation = Todo.class)))
+            schema = @Schema(implementation = Todo.class))),
+        @ApiResponse(responseCode = "400", description = "参数验证失败")
     })
     @PostMapping
-    public Todo create(@Parameter(description = "待办事项详情") @RequestBody Todo todo) { 
+    public Todo create(@Parameter(description = "待办事项详情") @Valid @RequestBody Todo todo) { 
         return todoService.createTodo(todo); 
     }
 
@@ -42,11 +46,12 @@ public class TodoController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "成功更新待办事项",
             content = @Content(schema = @Schema(implementation = Todo.class))),
+        @ApiResponse(responseCode = "400", description = "参数验证失败"),
         @ApiResponse(responseCode = "404", description = "待办事项不存在")
     })
     @PutMapping("/{id}")
     public Todo update(@Parameter(description = "待办事项ID") @PathVariable Long id, 
-                      @Parameter(description = "待办事项更新详情") @RequestBody Todo todo) {
+                      @Parameter(description = "待办事项更新详情") @Valid @RequestBody Todo todo) {
         return todoService.updateTodo(id, todo);
     }
     
