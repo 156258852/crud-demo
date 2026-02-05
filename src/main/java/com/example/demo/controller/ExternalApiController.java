@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.client.ExternalApiService;
+import com.example.demo.service.ExternalApiService;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

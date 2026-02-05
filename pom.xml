@@ -16,6 +16,7 @@
     <properties>
         <java.version>17</java.version>
         <springdoc.version>2.2.0</springdoc.version>
+        <openapi.generator.version>7.0.1</openapi.generator.version>
     </properties>
     <dependencies>
         <dependency>
@@ -54,6 +55,20 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- OpenAPI Generator 依赖 -->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -72,4 +87,54 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- OpenAPI Generator Profile -->
+        <profile>
+            <id>generate-client</id>
+            <activation>
+                <file>
+                    <exists>src/main/openapi/petstore.yaml</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <version>7.0.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <inputSpec>${project.basedir}/src/main/openapi/petstore.yaml</inputSpec>
+                                    <generatorName>java</generatorName>
+                                    <library>webclient</library>
+                                    <generateApiTests>false</generateApiTests>
+                                    <generateModelTests>false</generateModelTests>
+                                    <generateApis>true</generateApis>
+                                    <generateModels>true</generateModels>
+                                    <generateSupportingFiles>true</generateSupportingFiles>
+                                    <skipFormModel>true</skipFormModel>
+                                    <configOptions>
+                                        <sourceFolder>.</sourceFolder>
+                                        <useJakartaEe>true</useJakartaEe>
+                                        <dateLibrary>java8</dateLibrary>
+                                        <withXml>false</withXml>
+                                        <docsGenerator>none</docsGenerator>
+                                    </configOptions>
+                                    <output>src/main/java</output>
+                                    <packageName>com.example.demo.client.petstore</packageName>
+                                    <apiPackage>com.example.demo.client.petstore.api</apiPackage>
+                                    <modelPackage>com.example.demo.client.petstore.model</modelPackage>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
