@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.EmailLoginRequest;
+import com.example.demo.dto.EmailRegisterRequest;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.response.ApiResponse;
@@ -35,5 +37,17 @@ public class AuthController {
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.success(userService.login(request));
+    }
+
+    @Operation(summary = "邮箱验证码注册", description = "使用邮箱验证码注册新用户并返回 JWT Token")
+    @PostMapping("/register/email")
+    public ApiResponse<AuthResponse> registerByEmail(@Valid @RequestBody EmailRegisterRequest request) {
+        return ApiResponse.success(userService.registerByEmail(request));
+    }
+
+    @Operation(summary = "邮箱验证码登录", description = "使用邮箱验证码登录并返回 JWT Token")
+    @PostMapping("/login/email")
+    public ApiResponse<AuthResponse> loginByEmail(@Valid @RequestBody EmailLoginRequest request) {
+        return ApiResponse.success(userService.loginByEmail(request));
     }
 }

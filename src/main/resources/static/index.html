@@ -2,94 +2,275 @@
 <html>
 <head>
   <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Todo BFF Demo</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
+      margin: 0;
       padding: 20px;
-      background-color: #f5f7fa;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
     }
     #app {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .container {
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 30px;
     }
     h2 {
       color: #2c3e50;
       margin-top: 0;
       text-align: center;
-      border-bottom: 2px solid #3498db;
+      border-bottom: 2px solid #667eea;
       padding-bottom: 15px;
+      font-size: 28px;
+    }
+    
+    /* Auth Styles */
+    .auth-container {
+      max-width: 450px;
+      margin: 50px auto;
+    }
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #eee;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: #95a5a6;
+      transition: all 0.3s;
+    }
+    .auth-tab:hover {
+      color: #667eea;
+    }
+    .auth-tab.active {
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+      font-weight: bold;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+    .code-input-group {
+      display: flex;
+      gap: 10px;
+    }
+    .code-input-group input {
+      flex: 1;
+    }
+    .code-input-group button {
+      white-space: nowrap;
+      min-width: 120px;
+    }
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .alert {
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .alert-error {
+      background-color: #fee;
+      color: #c0392b;
+      border: 1px solid #fcc;
+    }
+    .alert-success {
+      background-color: #efe;
+      color: #27ae60;
+      border: 1px solid #cfc;
+    }
+    .alert-info {
+      background-color: #eef;
+      color: #2980b9;
+      border: 1px solid #ccf;
+    }
+    
+    /* Todo Styles */
+    .todo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .user-details {
+      flex: 1;
+    }
+    .user-name {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .user-role {
+      font-size: 12px;
+      color: #95a5a6;
+      background: #f0f0f0;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .btn-logout {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    .btn-logout:hover {
+      background: #c0392b;
     }
     .input-group {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
     }
-    input {
+    .input-group input {
       flex: 1;
       padding: 12px;
       border: 1px solid #ddd;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 16px;
     }
-    input:focus {
+    .input-group input:focus {
       outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
     }
-    button {
-      background-color: #3498db;
+    .btn-add {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 4px;
+      padding: 12px 24px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s;
+      transition: transform 0.2s;
     }
-    button:hover {
-      background-color: #2980b9;
+    .btn-add:hover {
+      transform: translateY(-2px);
     }
-    .edit-btn, .save-btn, .cancel-btn {
-      background-color: #f39c12;
+    .action-btn {
+      border: none;
       padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
       font-size: 14px;
       margin-right: 5px;
+      transition: all 0.2s;
     }
-    .edit-btn:hover, .save-btn:hover, .cancel-btn:hover {
+    .edit-btn {
+      background-color: #f39c12;
+      color: white;
+    }
+    .edit-btn:hover {
       background-color: #d35400;
     }
     .save-btn {
       background-color: #3498db;
+      color: white;
     }
     .save-btn:hover {
       background-color: #2980b9;
     }
     .cancel-btn {
       background-color: #95a5a6;
+      color: white;
     }
     .cancel-btn:hover {
       background-color: #7f8c8d;
     }
     .toggle-btn {
       background-color: #2ecc71;
-      padding: 6px 12px;
-      font-size: 14px;
-      margin-right: 5px;
+      color: white;
     }
     .toggle-btn:hover {
       background-color: #27ae60;
     }
     .delete-btn {
       background-color: #e74c3c;
-      padding: 6px 12px;
-      font-size: 14px;
+      color: white;
     }
     .delete-btn:hover {
       background-color: #c0392b;
@@ -102,20 +283,27 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      margin-bottom: 8px;
-      background-color: #f8f9fa;
-      border-radius: 4px;
-      border-left: 4px solid #3498db;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #f8f9fa, #ffffff);
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     li:nth-child(even) {
       border-left-color: #2ecc71;
-      background-color: #f0faf5;
+      background: linear-gradient(to right, #f0faf5, #ffffff);
     }
     .todo-text {
       flex: 1;
       word-break: break-word;
       padding-right: 15px;
+      font-size: 16px;
     }
     .completed {
       text-decoration: line-through;
@@ -124,63 +312,488 @@
     .editing-input {
       flex: 1;
       padding: 8px;
-      border: 1px solid #3498db;
+      border: 2px solid #667eea;
       border-radius: 4px;
       margin-right: 10px;
+      font-size: 16px;
     }
     .empty-state {
       text-align: center;
       color: #95a5a6;
       font-style: italic;
-      padding: 20px;
+      padding: 40px 20px;
+    }
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #667eea;
+    }
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .countdown {
+      font-size: 12px;
+      color: #95a5a6;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
 <div id="app">
-  <h2>Todo List</h2>
-  <div class="input-group">
-    <input v-model="text" @keyup.enter="add" placeholder="输入新的待办事项...">
-    <button @click="add">添加</button>
+  <!-- 加载状态 -->
+  <div v-if="loading" class="container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>加载中...</div>
+    </div>
   </div>
-  <ul v-if="todos.length > 0">
-    <li v-for="t in todos" :key="t.id">
-      <span v-if="!t.editing" class="todo-text" :class="{ 'completed': t.done }">{{ t.text }}</span>
-      <input v-else v-model="t.editText" class="editing-input" @keyup.enter="finishEdit(t)" />
-      <div>
-        <button v-if="!t.editing" class="edit-btn" @click="startEdit(t)">编辑</button>
-        <button v-if="t.editing" class="save-btn" @click="finishEdit(t)">保存</button>
-        <button v-if="t.editing" class="cancel-btn" @click="cancelEdit(t)">取消</button>
-        <button class="toggle-btn" @click="toggle(t)">
-          {{ t.done ? '标记未完成' : '标记完成' }}
-        </button>
-        <button class="delete-btn" @click="del(t.id)">删除</button>
+  
+  <!-- 认证页面 -->
+  <div v-else-if="!isAuthenticated" class="container auth-container">
+    <h2>📝 Todo 待办事项</h2>
+    
+    <div class="auth-tabs">
+      <button class="auth-tab" :class="{ active: authMode === 'login' }" @click="authMode = 'login'">登录</button>
+      <button class="auth-tab" :class="{ active: authMode === 'register' }" @click="authMode = 'register'">注册</button>
+    </div>
+    
+    <!-- 提示信息 -->
+    <div v-if="authMessage" :class="['alert', authMessageType === 'error' ? 'alert-error' : 'alert-success']">
+      {{ authMessage }}
+    </div>
+    
+    <!-- 登录表单 -->
+    <div v-if="authMode === 'login'">
+      <div class="auth-tabs" style="margin-bottom: 15px; border-bottom: 1px solid #eee;">
+        <button class="auth-tab" :class="{ active: loginType === 'password' }" @click="loginType = 'password'" style="font-size: 14px; padding: 10px;">密码登录</button>
+        <button class="auth-tab" :class="{ active: loginType === 'email' }" @click="loginType = 'email'" style="font-size: 14px; padding: 10px;">邮箱验证码登录</button>
       </div>
-    </li>
-  </ul>
-  <div v-else class="empty-state">
-    暂无待办事项，添加一个新的吧！
+      
+      <!-- 密码登录 -->
+      <div v-if="loginType === 'password'">
+        <div class="form-group">
+          <label>用户名</label>
+          <input v-model="loginForm.username" placeholder="请输入用户名" @keyup.enter="handleLogin">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" v-model="loginForm.password" placeholder="请输入密码" @keyup.enter="handleLogin">
+        </div>
+      </div>
+      
+      <!-- 邮箱验证码登录 -->
+      <div v-else>
+        <div class="form-group">
+          <label>邮箱</label>
+          <div class="code-input-group">
+            <input v-model="loginForm.email" type="email" placeholder="请输入邮箱">
+            <button @click="sendCode" :disabled="countdown > 0">
+              {{ countdown > 0 ? countdown + '秒后重发' : '获取验证码' }}
+            </button>
+          </div>
+          <div v-if="countdown > 0" class="countdown">验证码已发送，请注意查收</div>
+        </div>
+        <div class="form-group">
+          <label>验证码</label>
+          <input v-model="loginForm.code" placeholder="请输入验证码" @keyup.enter="handleLogin">
+        </div>
+      </div>
+      
+      <button class="btn-primary" @click="handleLogin" :disabled="isSubmitting">
+        {{ isSubmitting ? '登录中...' : '登录' }}
+      </button>
+    </div>
+    
+    <!-- 注册表单 -->
+    <div v-if="authMode === 'register'">
+      <div class="auth-tabs" style="margin-bottom: 15px; border-bottom: 1px solid #eee;">
+        <button class="auth-tab" :class="{ active: registerType === 'password' }" @click="registerType = 'password'" style="font-size: 14px; padding: 10px;">密码注册</button>
+        <button class="auth-tab" :class="{ active: registerType === 'email' }" @click="registerType = 'email'" style="font-size: 14px; padding: 10px;">邮箱验证码注册</button>
+      </div>
+      
+      <!-- 密码注册 -->
+      <div v-if="registerType === 'password'">
+        <div class="form-group">
+          <label>用户名</label>
+          <input v-model="registerForm.username" placeholder="请输入用户名（3-50 个字符）">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" v-model="registerForm.password" placeholder="请输入密码（至少 6 个字符）">
+        </div>
+      </div>
+      
+      <!-- 邮箱验证码注册 -->
+      <div v-else>
+        <div class="form-group">
+          <label>邮箱</label>
+          <div class="code-input-group">
+            <input v-model="registerForm.email" type="email" placeholder="请输入邮箱">
+            <button @click="sendCode" :disabled="countdown > 0">
+              {{ countdown > 0 ? countdown + '秒后重发' : '获取验证码' }}
+            </button>
+          </div>
+          <div v-if="countdown > 0" class="countdown">验证码已发送，请注意查收</div>
+        </div>
+        <div class="form-group">
+          <label>验证码</label>
+          <input v-model="registerForm.code" placeholder="请输入验证码">
+        </div>
+        <div class="form-group">
+          <label>用户名</label>
+          <input v-model="registerForm.username" placeholder="请输入用户名（3-50 个字符）">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" v-model="registerForm.password" placeholder="请输入密码（至少 6 个字符）">
+        </div>
+      </div>
+      
+      <button class="btn-primary" @click="handleRegister" :disabled="isSubmitting">
+        {{ isSubmitting ? '注册中...' : '注册' }}
+      </button>
+    </div>
+  </div>
+  
+  <!-- Todo 列表页面 -->
+  <div v-else class="container">
+    <div class="todo-header">
+      <h2>✅ Todo 待办事项</h2>
+      <div class="user-info">
+        <div class="user-avatar">{{ userAvatar }}</div>
+        <div class="user-details">
+          <div class="user-name">{{ currentUser.username }}</div>
+          <span class="user-role">{{ currentUser.role }}</span>
+        </div>
+        <button class="btn-logout" @click="logout">退出</button>
+      </div>
+    </div>
+    
+    <div class="input-group">
+      <input v-model="text" @keyup.enter="add" placeholder="输入新的待办事项...">
+      <button class="btn-add" @click="add">添加</button>
+    </div>
+    
+    <ul v-if="todos.length > 0">
+      <li v-for="t in todos" :key="t.id">
+        <span v-if="!t.editing" class="todo-text" :class="{ 'completed': t.done }">{{ t.text }}</span>
+        <input v-else v-model="t.editText" class="editing-input" @keyup.enter="finishEdit(t)" />
+        <div>
+          <button v-if="!t.editing" class="action-btn edit-btn" @click="startEdit(t)">编辑</button>
+          <button v-if="t.editing" class="action-btn save-btn" @click="finishEdit(t)">保存</button>
+          <button v-if="t.editing" class="action-btn cancel-btn" @click="cancelEdit(t)">取消</button>
+          <button class="action-btn toggle-btn" @click="toggle(t)">
+            {{ t.done ? '↩️ 未完成' : '✅ 完成' }}
+          </button>
+          <button class="action-btn delete-btn" @click="del(t.id)">🗑️ 删除</button>
+        </div>
+      </li>
+    </ul>
+    
+    <div v-else class="empty-state">
+      <div class="empty-state-icon">📋</div>
+      <div>暂无待办事项，添加一个新的吧！</div>
+    </div>
   </div>
 </div>
+
 <script>
-  const { createApp, ref, onMounted } = Vue;
-  
+  const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
+
+  // 配置 axios
+  const api = axios.create({
+    baseURL: '',
+    timeout: 10000
+  });
+
+  // 请求拦截器 - 添加 Token
+  api.interceptors.request.use(config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  // 响应拦截器 - 处理 401
+  api.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.reload();
+      }
+      return Promise.reject(error);
+    }
+  );
+
   createApp({
     setup() {
+      // 认证相关
+      const loading = ref(true);
+      const isAuthenticated = ref(false);
+      const authMode = ref('login'); // 'login' or 'register'
+      const loginType = ref('password'); // 'password' or 'email'
+      const registerType = ref('email'); // 'password' or 'email'
+      const authMessage = ref('');
+      const authMessageType = ref('success');
+      const isSubmitting = ref(false);
+      const countdown = ref(0);
+      let countdownTimer = null;
+
+      const currentUser = ref({
+        username: '',
+        role: ''
+      });
+
+      const loginForm = ref({
+        username: '',
+        password: '',
+        email: '',
+        code: ''
+      });
+
+      const registerForm = ref({
+        username: '',
+        password: '',
+        email: '',
+        code: '',
+        role: 'USER'
+      });
+
+      // Todo 相关
       const todos = ref([]);
       const text = ref('');
-      
-      const api = {
-        fetchTodos: () => axios.get('/api/todo'),
-        createTodo: (data) => axios.post('/api/todo', data),
-        updateTodo: (id, data) => axios.put(`/api/todo/${id}`, data),
-        deleteTodo: (id) => axios.delete(`/api/todo/${id}`),
-        toggleTodo: (id) => axios.patch(`/api/todo/${id}/toggle`)
+
+      // 用户头像
+      const userAvatar = computed(() => {
+        return currentUser.value.username ? currentUser.value.username.charAt(0).toUpperCase() : 'U';
+      });
+
+      // 启动倒计时
+      const startCountdown = () => {
+        countdown.value = 60;
+        if (countdownTimer) clearInterval(countdownTimer);
+        countdownTimer = setInterval(() => {
+          countdown.value--;
+          if (countdown.value <= 0) {
+            clearInterval(countdownTimer);
+          }
+        }, 1000);
       };
-      
+
+      // 显示消息
+      const showMessage = (message, type = 'success') => {
+        authMessage.value = message;
+        authMessageType.value = type;
+        setTimeout(() => {
+          authMessage.value = '';
+        }, 5000);
+      };
+
+      // 发送验证码
+      const sendCode = async () => {
+        const email = loginType.value === 'email' ? loginForm.value.email : registerForm.value.email;
+        
+        if (!email) {
+          showMessage('请输入邮箱地址', 'error');
+          return;
+        }
+
+        // 简单的邮箱格式验证
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          showMessage('请输入有效的邮箱地址', 'error');
+          return;
+        }
+
+        try {
+          await api.post('/api/email/send-code', { email });
+          showMessage('验证码已发送到邮箱，请注意查收', 'success');
+          startCountdown();
+        } catch (error) {
+          console.error('发送验证码失败:', error);
+          showMessage(error.response?.data?.message || '发送验证码失败，请重试', 'error');
+        }
+      };
+
+      // 处理登录
+      const handleLogin = async () => {
+        isSubmitting.value = true;
+        
+        try {
+          let response;
+          if (loginType.value === 'password') {
+            if (!loginForm.value.username || !loginForm.value.password) {
+              showMessage('请输入用户名和密码', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            response = await api.post('/api/auth/login', {
+              username: loginForm.value.username,
+              password: loginForm.value.password
+            });
+          } else {
+            if (!loginForm.value.email || !loginForm.value.code) {
+              showMessage('请输入邮箱和验证码', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            response = await api.post('/api/auth/login/email', {
+              email: loginForm.value.email,
+              code: loginForm.value.code
+            });
+          }
+
+          const data = response.data.data;
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify({
+            username: data.username,
+            role: data.role
+          }));
+          
+          currentUser.value = {
+            username: data.username,
+            role: data.role
+          };
+          isAuthenticated.value = true;
+          showMessage('登录成功！', 'success');
+          
+          // 清空表单
+          loginForm.value = { username: '', password: '', email: '', code: '' };
+          
+          // 加载 Todo 列表
+          await loadTodos();
+        } catch (error) {
+          console.error('登录失败:', error);
+          showMessage(error.response?.data?.message || '登录失败，请检查用户名和密码', 'error');
+        } finally {
+          isSubmitting.value = false;
+        }
+      };
+
+      // 处理注册
+      const handleRegister = async () => {
+        isSubmitting.value = true;
+        
+        try {
+          let response;
+          if (registerType.value === 'password') {
+            if (!registerForm.value.username || !registerForm.value.password) {
+              showMessage('请输入用户名和密码', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            if (registerForm.value.username.length < 3) {
+              showMessage('用户名至少需要 3 个字符', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            if (registerForm.value.password.length < 6) {
+              showMessage('密码至少需要 6 个字符', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            response = await api.post('/api/auth/register', {
+              username: registerForm.value.username,
+              password: registerForm.value.password,
+              role: registerForm.value.role
+            });
+          } else {
+            if (!registerForm.value.email || !registerForm.value.code || !registerForm.value.username || !registerForm.value.password) {
+              showMessage('请填写所有必填字段', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            if (registerForm.value.username.length < 3) {
+              showMessage('用户名至少需要 3 个字符', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            if (registerForm.value.password.length < 6) {
+              showMessage('密码至少需要 6 个字符', 'error');
+              isSubmitting.value = false;
+              return;
+            }
+            response = await api.post('/api/auth/register/email', {
+              email: registerForm.value.email,
+              code: registerForm.value.code,
+              username: registerForm.value.username,
+              password: registerForm.value.password,
+              role: registerForm.value.role
+            });
+          }
+
+          const data = response.data.data;
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify({
+            username: data.username,
+            role: data.role
+          }));
+          
+          currentUser.value = {
+            username: data.username,
+            role: data.role
+          };
+          isAuthenticated.value = true;
+          showMessage('注册成功！', 'success');
+          
+          // 清空表单
+          registerForm.value = { username: '', password: '', email: '', code: '', role: 'USER' };
+          
+          // 加载 Todo 列表
+          await loadTodos();
+        } catch (error) {
+          console.error('注册失败:', error);
+          showMessage(error.response?.data?.message || '注册失败，请重试', 'error');
+        } finally {
+          isSubmitting.value = false;
+        }
+      };
+
+      // 退出登录
+      const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        isAuthenticated.value = false;
+        currentUser.value = { username: '', role: '' };
+        todos.value = [];
+        text.value = '';
+        authMode.value = 'login';
+        loginType.value = 'password';
+        registerType.value = 'email';
+        loginForm.value = { username: '', password: '', email: '', code: '' };
+        registerForm.value = { username: '', password: '', email: '', code: '', role: 'USER' };
+      };
+
+      // Todo API
+      const todoApi = {
+        fetchTodos: () => api.get('/api/todo'),
+        createTodo: (data) => api.post('/api/todo', data),
+        updateTodo: (id, data) => api.put(`/api/todo/${id}`, data),
+        deleteTodo: (id) => api.delete(`/api/todo/${id}`),
+        toggleTodo: (id) => api.patch(`/api/todo/${id}/toggle`)
+      };
+
+      // 加载 Todo 列表
       const loadTodos = async () => {
         try {
-          const response = await api.fetchTodos();
+          const response = await todoApi.fetchTodos();
           todos.value = response.data.map(todo => ({
             ...todo,
             editing: false,
@@ -188,84 +801,129 @@
           }));
         } catch (error) {
           console.error('加载待办事项失败:', error);
-          alert('加载数据失败，请刷新页面重试');
+          showMessage('加载数据失败，请刷新页面重试', 'error');
         }
       };
-      
+
+      // 添加 Todo
       const addTodo = async () => {
         if (!text.value.trim()) return;
-        
+
         try {
-          await api.createTodo({ text: text.value, done: false });
+          await todoApi.createTodo({ text: text.value, done: false });
           text.value = '';
           await loadTodos();
         } catch (error) {
           console.error('添加待办事项失败:', error);
-          alert('添加失败，请重试');
+          showMessage('添加失败，请重试', 'error');
         }
       };
-      
+
+      // 删除 Todo
       const deleteTodo = async (id) => {
         try {
-          await api.deleteTodo(id);
+          await todoApi.deleteTodo(id);
           await loadTodos();
         } catch (error) {
           console.error('删除待办事项失败:', error);
-          alert('删除失败，请重试');
+          showMessage('删除失败，请重试', 'error');
         }
       };
-      
+
+      // 开始编辑
       const startEdit = (todo) => {
         todo.editing = true;
         todo.editText = todo.text;
       };
-      
+
+      // 完成编辑
       const finishEdit = async (todo) => {
         if (!todo.editText.trim()) {
-          alert('待办事项不能为空！');
+          showMessage('待办事项不能为空！', 'error');
           return;
         }
-        
+
         try {
-          await api.updateTodo(todo.id, { 
-            text: todo.editText, 
-            done: todo.done 
+          await todoApi.updateTodo(todo.id, {
+            text: todo.editText,
+            done: todo.done
           });
-          await loadTodos(); // 重新加载列表
+          await loadTodos();
         } catch (error) {
           console.error('更新待办事项失败:', error);
-          alert('更新失败，请重试');
+          showMessage('更新失败，请重试', 'error');
         }
       };
-      
+
+      // 取消编辑
       const cancelEdit = (todo) => {
         todo.editing = false;
         todo.editText = todo.text;
       };
-      
+
+      // 切换状态
       const toggleTodoStatus = async (todo) => {
         try {
-          const response = await api.toggleTodo(todo.id);
-          // 更新本地数据
+          const response = await todoApi.toggleTodo(todo.id);
           const index = todos.value.findIndex(item => item.id === todo.id);
           if (index !== -1) {
             todos.value[index] = response.data;
           }
         } catch (error) {
           console.error('切换待办事项状态失败:', error);
-          alert('状态切换失败，请重试');
+          showMessage('状态切换失败，请重试', 'error');
         }
       };
-      
+
+      // 初始化
       onMounted(() => {
-        loadTodos();
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+
+        if (token && user) {
+          try {
+            const userData = JSON.parse(user);
+            currentUser.value = userData;
+            isAuthenticated.value = true;
+            loadTodos();
+          } catch (e) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        }
+        loading.value = false;
       });
-      
-      // 返回响应式数据和方法
+
+      // 清理定时器
+      onUnmounted(() => {
+        if (countdownTimer) {
+          clearInterval(countdownTimer);
+        }
+      });
+
       return {
+        // 认证相关
+        loading,
+        isAuthenticated,
+        authMode,
+        loginType,
+        registerType,
+        authMessage,
+        authMessageType,
+        isSubmitting,
+        countdown,
+        currentUser,
+        userAvatar,
+        loginForm,
+        registerForm,
+        sendCode,
+        handleLogin,
+        handleRegister,
+        logout,
+        
+        // Todo 相关
         todos,
         text,
-        loadTodos,
         add: addTodo,
         del: deleteTodo,
         startEdit,

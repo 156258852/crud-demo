@@ -13,6 +13,20 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  # 邮件配置
+  mail:
+    host: ${MAIL_HOST:smtp.qq.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+    default-encoding: UTF-8
 
 server:
   port: 8080
@@ -54,3 +68,9 @@ jwt:
   # export JWT_SECRET="your-secure-random-secret-key-at-least-256-bits"
   secret: ${JWT_SECRET:your-very-long-secret-key-that-should-be-at-least-256-bits-long-for-hs256-algorithm-security}
   expiration: 86400000
+
+email:
+  verification:
+    code-length: 6
+    expiration-minutes: 10
+    from: ${MAIL_FROM:${MAIL_USERNAME}}

@@ -32,6 +32,15 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理业务异常（验证失败、业务规则冲突等）
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(400, ex.getMessage()));
+    }
+
+    /**
      * 处理 Todo 未找到异常
      */
     @ExceptionHandler(TodoNotFoundException.class)

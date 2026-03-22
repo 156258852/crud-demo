@@ -42,13 +42,20 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 // 配置授权规则
                 .authorizeHttpRequests(auth -> auth
-                        // 公开接口：注册、登录、Swagger
+                        // 公开接口：注册、登录、Swagger、静态资源
                         .requestMatchers(
                                 "/api/auth/**",
+                                "/api/email/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/h2-console/**"
+                                "/h2-console/**",
+                                "/",
+                                "/index.html",
+                                "/*.html",
+                                "/*.css",
+                                "/*.js",
+                                "/static/**"
                         ).permitAll()
                         // 其他所有请求需要认证
                         .anyRequest().authenticated()

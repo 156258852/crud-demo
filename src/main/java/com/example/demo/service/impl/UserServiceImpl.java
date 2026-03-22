@@ -1,11 +1,15 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.EmailLoginRequest;
+import com.example.demo.dto.EmailRegisterRequest;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.exception.BusinessException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtService;
+import com.example.demo.service.EmailService;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -48,6 +53,47 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在"));
+
+        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+
+        return buildAuthResponse(user, token);
+    }
+
+    @Override
+    public AuthResponse registerByEmail(EmailRegisterRequest request) {
+        if (!emailService.verifyCode(request.getEmail(), request.getCode())) {
+            throw new BusinessException("验证码无效或已过期");
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("该邮箱已被注册");
+        }
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new BusinessException("用户名已存在");
+        }
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail());
+        user.setRole(getRoleOrDefault(request.getRole()));
+
+        userRepository.save(user);
+
+        String token = jwtService.generateToken(user.getUsername(), user.getRole());
+
+        return buildAuthResponse(user, token);
+    }
+
+    @Override
+    public AuthResponse loginByEmail(EmailLoginRequest request) {
+        if (!emailService.verifyCode(request.getEmail(), request.getCode())) {
+            throw new BusinessException("验证码无效或已过期");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BusinessException("用户不存在"));
 
         String token = jwtService.generateToken(user.getUsername(), user.getRole());
 
