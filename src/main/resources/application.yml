@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: demo
+  datasource:
+    url: jdbc:mysql://localhost:3306/todo_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: "123456"
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+# Spring Boot Actuator 配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    web: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+    org.hibernate: DEBUG
+    com.example.demo: DEBUG
+
+external:
+  api:
+    base-url: https://jsonplaceholder.typicode.com
+
+jwt:
+  # 生产环境请使用环境变量设置 JWT_SECRET
+  # export JWT_SECRET="your-secure-random-secret-key-at-least-256-bits"
+  secret: ${JWT_SECRET:your-very-long-secret-key-that-should-be-at-least-256-bits-long-for-hs256-algorithm-security}
+  expiration: 86400000

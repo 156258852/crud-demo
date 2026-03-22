@@ -1,52 +1,58 @@
-package com.example.demo.client;
+package com.example.demo.client.impl;
 
+import com.example.demo.client.ExternalApiClient;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-@Service
+/**
+ * 外部 API 客户端实现类
+ */
+@Component
 @RequiredArgsConstructor
 @Slf4j
-public class ExternalApiService {
+public class ExternalApiClientImpl implements ExternalApiClient {
 
     private final WebClient.Builder webClientBuilder;
-    
+
     @Value("${external.api.base-url:https://jsonplaceholder.typicode.com}")
     private String externalApiBaseUrl;
 
-    /**
-     * 获取外部API的用户信息
-     */
+    private WebClient webClient;
+
+    @PostConstruct
+    public void init() {
+        this.webClient = webClientBuilder
+                .baseUrl(externalApiBaseUrl)
+                .build();
+    }
+
+    @Override
     public Mono<JsonNode> getUserById(Long userId) {
         log.info("Fetching user with id: {}", userId);
-        
-        return webClientBuilder
-                .baseUrl(externalApiBaseUrl)
-                .build()
+
+        return webClient
                 .get()
                 .uri("/users/{id}", userId)
                 .retrieve()
-                .bodyToMono(JsonNode.class)// 将响应体转换为JsonNode
+                .bodyToMono(JsonNode.class)
                 .doOnSuccess(user -> log.info("Successfully retrieved user: {}", user.get("name").asText()))
                 .doOnError(error -> log.error("Error retrieving user: ", error));
     }
 
-    /**
-     * 获取外部API的所有用户
-     */
+    @Override
     public Flux<JsonNode> getAllUsers() {
         log.info("Fetching all users");
-        
-        return webClientBuilder
-                .baseUrl(externalApiBaseUrl)
-                .build()
+
+        return webClient
                 .get()
                 .uri("/users")
                 .retrieve()
@@ -55,15 +61,11 @@ public class ExternalApiService {
                 .doOnError(error -> log.error("Error retrieving users: ", error));
     }
 
-    /**
-     * 获取外部API的帖子信息
-     */
+    @Override
     public Flux<JsonNode> getPostsByUserId(Long userId) {
         log.info("Fetching posts for user: {}", userId);
-        
-        return webClientBuilder
-                .baseUrl(externalApiBaseUrl)
-                .build()
+
+        return webClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/posts")
@@ -75,15 +77,11 @@ public class ExternalApiService {
                 .doOnError(error -> log.error("Error retrieving posts: ", error));
     }
 
-    /**
-     * 调用外部API创建资源
-     */
+    @Override
     public Mono<JsonNode> createUser(Map<String, Object> userData) {
         log.info("Creating user with data: {}", userData);
 
-        return webClientBuilder
-                .baseUrl(externalApiBaseUrl)
-                .build()
+        return webClient
                 .post()
                 .uri("/users")
                 .bodyValue(userData)

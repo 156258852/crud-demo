@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.client.ExternalApiService;
+import com.example.demo.client.ExternalApiClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,31 +18,31 @@ import java.util.Map;
 @Tag(name = "外部API调用", description = "用于调用外部API的接口")
 public class ExternalApiController {
 
-    private final ExternalApiService externalApiService;
+    private final ExternalApiClient externalApiClient;
 
     @Operation(summary = "获取外部用户信息", description = "根据ID获取外部API的用户信息")
     @GetMapping("/user/{id}")
     public Mono<JsonNode> getUserById(
             @Parameter(description = "用户ID") @PathVariable Long id) {
-        return externalApiService.getUserById(id);
+        return externalApiClient.getUserById(id);
     }
 
     @Operation(summary = "获取所有外部用户", description = "获取外部API的所有用户信息")
     @GetMapping("/users")
     public Flux<JsonNode> getAllUsers() {
-        return externalApiService.getAllUsers();
+        return externalApiClient.getAllUsers();
     }
 
     @Operation(summary = "获取用户的帖子", description = "根据用户ID获取该用户的所有帖子")
     @GetMapping("/user/{id}/posts")
     public Flux<JsonNode> getPostsByUserId(
             @Parameter(description = "用户ID") @PathVariable Long id) {
-        return externalApiService.getPostsByUserId(id);
+        return externalApiClient.getPostsByUserId(id);
     }
 
     @Operation(summary = "创建外部用户", description = "在外部API中创建新用户")
     @PostMapping("/user")
     public Mono<JsonNode> createUser(@RequestBody Map<String, Object> userData) {
-        return externalApiService.createUser(userData);
+        return externalApiClient.createUser(userData);
     }
 }
