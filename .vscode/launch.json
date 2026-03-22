@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-DemoApplication<demo>",
+            "request": "launch",
+            "mainClass": "com.example.demo.DemoApplication",
+            "projectName": "demo",
+            "args": "",
+            "env":{
+                "MAIL_USERNAME": "1562588520@qq.com",
+                "MAIL_PASSWORD": "tiypeqoosvalcaej" 
+            }
+        }
+    ]
+}
