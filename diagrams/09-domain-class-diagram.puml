@@ -1,0 +1,43 @@
+@startuml
+title Domain Layer - Core Entities
+
+class User <<Entity>> {
+    - id: Long
+    - username: String
+    - password: String
+    - role: UserRole
+    - active: boolean
+    + changePassword(newPwd: String)
+    + activate()
+    + deactivate()
+    + isAdmin(): boolean
+}
+
+enum UserRole {
+    USER
+    ADMIN
+    MANAGER
+}
+
+class Money <<ValueObject>> {
+    - amount: BigDecimal
+    - currency: String
+    + add(other: Money): Money
+}
+
+class Email <<ValueObject>> {
+    - value: String
+}
+
+class UserRegisteredEvent <<DomainEvent>> {
+    - userId: Long
+    - username: String
+    - timestamp: LocalDateTime
+}
+
+class UserNotFoundException <<DomainException>>
+
+User --> UserRole
+User ..> UserRegisteredEvent
+User ..> Email
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+title Regular Architecture - Component Dependency
+
+component Controller
+component Service
+component Repository
+component Database
+component Model
+
+Controller --> Service
+Service --> Repository
+Repository --> Database
+
+Controller ..> Model
+Service ..> Model
+Repository ..> Model
+
+note right of Service
+  Problem: dependency chain too long
+  Change bottom affects top
+end note
+@enduml

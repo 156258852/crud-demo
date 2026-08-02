@@ -1,0 +1,23 @@
+@startuml
+title Architecture Comparison
+
+rectangle "Regular Architecture" {
+    [Controller] -right-> [Service] : direct dependency
+    [Service] -right-> [Repository] : direct dependency
+}
+
+rectangle "Hexagonal Architecture" {
+    ["adapter/in"] -right-> ["port/in"] : interface
+    ["port/in"] -right-> [Application]
+    [Application] -right-> ["port/out"] : interface
+    ["port/out"] -right-> ["adapter/out"]
+}
+
+note bottom of "Regular Architecture"
+  Change one -> affects entire chain
+end note
+
+note bottom of "Hexagonal Architecture"
+  Change impl -> business logic unaffected
+end note
+@enduml

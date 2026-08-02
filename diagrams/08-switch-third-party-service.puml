@@ -1,0 +1,32 @@
+@startuml
+title Switch Third-Party Service
+
+interface SmsService {
+    + send(phone: String, message: String)
+}
+
+class AliyunSmsAdapter {
+    - aliyunClient: AliyunSmsClient
+    + send(phone: String, message: String)
+}
+
+class TencentSmsAdapter {
+    - tencentClient: TencentSmsClient
+    + send(phone: String, message: String)
+}
+
+class BusinessService {
+    - smsService: SmsService
+    + notifyUser(phone: String)
+}
+
+BusinessService --> SmsService
+AliyunSmsAdapter ..|> SmsService
+TencentSmsAdapter ..|> SmsService
+
+note bottom of SmsService
+  Interface unchanged
+  Only swap Adapter
+  Zero business code change
+end note
+@enduml

@@ -1,0 +1,7 @@
+server:
+  port: 8081
+
+# 下游服务地址（域名变了改这里就行）
+weather:
+  api:
+    base-url: http://weather-service.com/api/v1

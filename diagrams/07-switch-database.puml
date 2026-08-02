@@ -1,0 +1,37 @@
+@startuml
+title Switch Database - Only Change Adapter
+
+interface UserRepository {
+    + save(user: User): User
+    + findById(id: Long): Optional
+    + existsByUsername(name: String): boolean
+}
+
+class UserService {
+    - userRepository: UserRepository
+    + save(user: User)
+}
+
+class MySQLUserRepository {
+    - jpaRepository: JpaRepository
+    + save(user: User): User
+    + findById(id: Long): Optional
+    + existsByUsername(name: String): boolean
+}
+
+class MongoUserRepository {
+    - mongoTemplate: MongoTemplate
+    + save(user: User): User
+    + findById(id: Long): Optional
+    + existsByUsername(name: String): boolean
+}
+
+UserService --> UserRepository
+MySQLUserRepository ..|> UserRepository
+MongoUserRepository ..|> UserRepository
+
+note right of UserService
+  Business code unchanged!
+  Only switch Adapter impl
+end note
+@enduml

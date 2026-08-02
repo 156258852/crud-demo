@@ -1,0 +1,18 @@
+@startuml
+title 常规 BFF 架构 - 数据流向
+
+actor Client
+participant "Controller" as C
+participant "Service" as S
+participant "Repository" as R
+database "数据库" as DB
+
+Client -> C : HTTP 请求
+C -> S : 调用业务方法
+S -> R : 数据库操作
+R -> DB : SQL
+DB --> R : 结果
+R --> S : Entity
+S --> C : DTO
+C --> Client : HTTP 响应
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+title 六边形架构 - 数据流向
+
+actor Client
+participant "adapter/in\nUserController" as AI
+participant "port/in\nUserUseCase" as PI
+participant "application\nUserService" as APP
+participant "port/out\nUserRepository" as PO
+participant "adapter/out\nRepositoryImpl" as AO
+database "DB" as DB
+
+Client -> AI : HTTP Request
+AI -> PI : call interface
+PI -> APP : implements
+APP -> PO : call storage interface
+PO -> AO : implements
+AO -> DB : SQL
+DB --> AO : result
+AO --> PO : Domain Object
+PO --> APP : Domain Object
+APP --> PI : Response
+PI --> AI : Response
+AI --> Client : HTTP Response
+@enduml

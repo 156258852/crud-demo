@@ -1,0 +1,20 @@
+@startuml
+title 六边形架构 - 依赖倒置
+
+interface UserUseCase
+interface UserRepository
+
+["adapter/in Controller"] ..> UserUseCase
+["application Service"] ..|> UserUseCase
+["Test Mock In"] ..|> UserUseCase
+
+["application Service"] ..> UserRepository
+["adapter/out MySQL"] ..|> UserRepository
+["adapter/out Mongo"] ..|> UserRepository
+["Test Mock Out"] ..|> UserRepository
+
+note bottom of UserRepository
+  All layers depend on port (interface)
+  not on concrete implementation
+end note
+@enduml

@@ -1,0 +1,80 @@
+# 下游"天气服务"的 Swagger 文档（下游给你的）
+openapi: 3.0.3
+info:
+  title: Weather Service API
+  version: 1.0.0
+  description: 下游天气服务的接口文档
+
+servers:
+  - url: http://weather-service.com/api/v1
+
+paths:
+  /weather:
+    get:
+      operationId: getWeather
+      summary: 根据城市查天气
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherResponse'
+
+  /weather/forecast:
+    get:
+      operationId: getForecast
+      summary: 获取未来几天预报
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: days
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 3
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ForecastItem'
+
+components:
+  schemas:
+    WeatherResponse:
+      type: object
+      properties:
+        city:
+          type: string
+        temperature:
+          type: number
+        weather_desc:
+          type: string
+        humidity:
+          type: integer
+
+    ForecastItem:
+      type: object
+      properties:
+        date:
+          type: string
+        high_temp:
+          type: number
+        low_temp:
+          type: number
+        weather_desc:
+          type: string

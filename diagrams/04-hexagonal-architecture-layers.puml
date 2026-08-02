@@ -1,0 +1,60 @@
+@startuml
+title 六边形架构 - 分层组件图
+
+package "adapter" {
+    package "adapter_in" {
+        [UserController]
+    }
+    package "adapter_out" {
+        [UserRepositoryAdapter]
+        [SendGridEmailAdapter]
+    }
+}
+
+package "port" {
+    package "port_in" {
+        interface UserUseCase
+    }
+    package "port_out" {
+        interface UserRepository
+        interface EmailService
+    }
+}
+
+package "application" {
+    [UserService]
+}
+
+package "domain" {
+    class User {
+        - id: Long
+        - username: String
+        - password: String
+        - role: UserRole
+        - active: boolean
+        + changePassword(newPwd)
+        + activate()
+        + deactivate()
+        + isAdmin(): boolean
+    }
+    class Money <<ValueObject>> {
+        - amount: BigDecimal
+        - currency: String
+        + add(other): Money
+    }
+    class UserRegisteredEvent <<DomainEvent>>
+    enum UserRole {
+        USER
+        ADMIN
+        MANAGER
+    }
+}
+
+[UserController] ..> UserUseCase
+[UserService] ..|> UserUseCase
+[UserService] ..> UserRepository
+[UserService] ..> EmailService
+[UserRepositoryAdapter] ..|> UserRepository
+[SendGridEmailAdapter] ..|> EmailService
+[UserService] ..> User
+@enduml
